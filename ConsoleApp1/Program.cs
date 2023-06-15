@@ -40,20 +40,37 @@ namespace MyNamespace
             string header1 = $"# {config.title}\n\n{config.description}\n\n";
             return header1;
         }
-        public static string BuildContent(string commits,CsogrcConfig config,string remoteaddr)
+        public static string BuildContent(string commits, CsogrcConfig config, string remoteaddr)
         {
             bool canbewriten = false;
+
+            Dictionary<string, List<object>> stacker = new Dictionary<string, List<object>>();
+            foreach (string key in config.committypes)
+            {
+                stacker.Add(key, new List<object>());
+            }
+
             string[] lines = commits.Split("\n");
-
-            
-
+            string com_ptn = @"commit\s.*\(";
+            string tag_ptn = @"^commit.*tag:\s.*";
+            string aor_ptn = @"Author:\s.*<";
+            string dte_ptn = @"Date:\s";
             foreach (string line in lines)
             {
-                string tag_ptn = @"commit\s.*\(";
-                string aor_ptn = @"Author:\s.*<";
-                string dte_ptn = @"Date:\s";
-                Match tag_mtc = Regex.Match(line, tag_ptn);
-                Console.WriteLine(line);
+                Match tag_mtc = Regex.Match(line, com_ptn);
+                if (tag_mtc.Success)
+                {
+                    Console.WriteLine("-----------commit------------");
+                    Console.WriteLine(tag_mtc.Value.ToString());
+                }
+                foreach (var item in config.committypes)
+                {
+                    if (line.StartsWith(item + ": "))
+                    {
+                        stacker[item].Add($"- { line } ([]())");
+                        break;
+                    }
+                }
             }
             return "";
         }
@@ -90,7 +107,7 @@ namespace MyNamespace
 
             try
             {
-                var yaml = File.ReadAllText(configpath,Encoding.UTF8);
+                var yaml = File.ReadAllText(configpath, Encoding.UTF8);
                 var deserializer = new DeserializerBuilder().Build();
                 var config = deserializer.Deserialize<CsogrcConfig>(yaml);
                 Console.WriteLine(yaml);
@@ -169,10 +186,10 @@ namespace MyNamespace
                     process.Close();
                 }
 
-                header= BuildHeader(config);
-                content= BuildContent(gitlogstr,config,gitrepoaddress);
+                header = BuildHeader(config);
+                content = BuildContent(gitlogstr, config, gitrepoaddress);
 
-                
+
                 using (StreamWriter writer = new StreamWriter(config.outputdir, false, Encoding.UTF8))
                 {
                     writer.Write(header);
