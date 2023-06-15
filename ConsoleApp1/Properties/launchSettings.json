@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ConsoleApp1": {
+      "commandName": "Project",
+      "commandLineArgs": "-c ./csogrc.yml",
+      "workingDirectory": "E:\\Datas\\vsapps\\ConsoleApp1\\ConsoleApp1"
+    }
+  }
+}

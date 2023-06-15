@@ -1,0 +1,11 @@
+projpath: E:\BPA\mc					
+branch: origin/main		
+description: 这是一个changelog
+title: ChangeLog Title
+committypes:				
+  - fix
+  - chore
+onlyusers:					
+  - lijie
+  - jiuxiang
+outputdir: ./changelog.md	
