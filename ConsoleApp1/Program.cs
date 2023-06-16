@@ -6,13 +6,27 @@ using YamlDotNet.Serialization;
 namespace MyNamespace
 {
     // 定义 csogrc.yml 对应的类
+    public class CommitType
+    {
+        public string value { get; set; }
+        public string description { get; set; }
+    }
+    public class Platform
+    {
+        public string name { get; set; }
+        public string tagbri { get; set; }
+        public string commitbri { get; set; }
+        public string issuebri { get; set; }
+    }
     public class CsogrcConfig
     {
+        public string useplatform { get; set; }
+        public Platform[] platform { get; set; }
         public string projpath { get; set; }
         public string branch { get; set; }
         public string title { get; set; }
-        public string[] committypes { get; set; }
-        public string[] onlyusers { get; set; }
+        public CommitType[] committypes { get; set; }
+        public CommitType[] onlyusers { get; set; }
         public string outputdir { get; set; }
         public string description { get; set; }
 
@@ -45,29 +59,33 @@ namespace MyNamespace
             bool canbewriten = false;
 
             Dictionary<string, List<object>> stacker = new Dictionary<string, List<object>>();
-            foreach (string key in config.committypes)
+            foreach (CommitType key in config.committypes)
             {
-                stacker.Add(key, new List<object>());
+                stacker.Add(key.value, new List<object>());
             }
 
             string[] lines = commits.Split("\n");
-            string com_ptn = @"commit\s.*\(";
-            string tag_ptn = @"^commit.*tag:\s.*";
+            string com_ptn = @"commit\s.*";
+            string tag_ptn = @"tag:\s.*\)";
             string aor_ptn = @"Author:\s.*<";
             string dte_ptn = @"Date:\s";
+            string isu_ptn = @"\d+";
             foreach (string line in lines)
             {
-                Match tag_mtc = Regex.Match(line, com_ptn);
-                if (tag_mtc.Success)
+                Match com_mtc = Regex.Match(line, com_ptn);
+                if (com_mtc.Success)
                 {
-                    Console.WriteLine("-----------commit------------");
-                    Console.WriteLine(tag_mtc.Value.ToString());
+                    Match tag_mtc = Regex.Match(com_mtc.Value, tag_ptn);
+                    if (tag_mtc.Success)
+                    {
+
+                    }
                 }
                 foreach (var item in config.committypes)
                 {
                     if (line.StartsWith(item + ": "))
                     {
-                        stacker[item].Add($"- { line } ([]())");
+                        stacker[item.value].Add($"- { line } ([]())");
                         break;
                     }
                 }
@@ -107,6 +125,9 @@ namespace MyNamespace
 
             try
             {
+                Regex regexJson = new Regex(@"\.json$", RegexOptions.IgnoreCase);
+                Regex regexYaml = new Regex(@"\.(yml|yaml)$", RegexOptions.IgnoreCase);
+
                 var yaml = File.ReadAllText(configpath, Encoding.UTF8);
                 var deserializer = new DeserializerBuilder().Build();
                 var config = deserializer.Deserialize<CsogrcConfig>(yaml);
@@ -120,7 +141,7 @@ namespace MyNamespace
                 ProcessStartInfo gittagpro = new ProcessStartInfo
                 {
                     FileName = "git",
-                    Arguments = $"tag",
+                    Arguments = $"tag --sort=-creatordate",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
