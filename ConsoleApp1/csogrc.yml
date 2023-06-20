@@ -12,8 +12,8 @@ platform:
     tagbri: /compare/
     commitbri: /commit/
     issuebri: /issues/
-projpath: E:\BPA\mc
-branch: origin/main
+projpath: E:\BPA\root
+branch: origin/develop
 description: 这是一个changelog
 title: ChangeLog Title
 committypes:
@@ -26,4 +26,4 @@ onlyusers:
     description: 前端开发
   - value: jiuxiang
     description: 后端开发
-outputdir: ./changelog.md
+outputdir: ./UI/changelog.md
