@@ -88,7 +88,7 @@ namespace MyNamespace
 
         public static string BuildHeader(CsogrcConfig config)
         {
-            string header1 = $"# {config.title}\n\n{config.description}\n\n";
+            string header1 = $"# {config.title}\n\n{config.description}\n";
             return header1;
         }
         public static string BuildContent(string commits, CsogrcConfig config, string remoteaddr)
