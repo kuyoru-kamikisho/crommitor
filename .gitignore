@@ -1,6 +1,4 @@
 # Visual Studio files
-# *.sln
-# *.csproj
 *.vcxproj
 *.vcxproj.filters
 *.csproj.user
