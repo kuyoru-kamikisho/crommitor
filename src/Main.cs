@@ -224,8 +224,7 @@ namespace MyNamespace
         static void Main(string[] args)
         {
 
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-
+            Console.OutputEncoding = Encoding.UTF8;
             string configpath = null;
 
             for (int i = 0; i < args.Length; i++)
@@ -240,12 +239,14 @@ namespace MyNamespace
             if (configpath == null)
             {
                 Console.WriteLine("Usage: csogrc.exe -c [config_path]");
+                Console.ReadKey();
                 return;
             }
 
             if (!File.Exists(configpath))
             {
                 Console.WriteLine($"Error: configFile '{configpath}' not found.");
+                Console.ReadKey();
                 return;
             }
 
@@ -330,6 +331,7 @@ namespace MyNamespace
                 {
                     writer.Write(header + content);
                 }
+                
             }
             catch (Exception ex)
             {
