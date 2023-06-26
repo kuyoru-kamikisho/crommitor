@@ -13,7 +13,7 @@ platform:
     commitbri: /commit/
     issuebri: /issues/
 projpath: E:\BPA\root
-branch: origin/develop
+branch: origin/main
 description: 这是一个changelog
 title: ChangeLog Title
 committypes:
@@ -22,7 +22,7 @@ committypes:
   - value: build
     description: 构建行为修改
 onlyusers:
-  - value: lijie
+  - value: lijie.xin
     description: 前端开发
   - value: jiuxiang
     description: 后端开发

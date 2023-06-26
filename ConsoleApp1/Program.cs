@@ -45,6 +45,32 @@ namespace MyNamespace
 
     class Program
     {
+        public static string LinkBuilder(string url, string path)
+        {
+            Uri uri = new Uri(url);
+            string newPath = "";
+            if (uri.AbsolutePath.LastIndexOf("/") > 0)
+            {
+                newPath = uri.AbsolutePath.Substring(0, uri.AbsolutePath.LastIndexOf("/")) + "/";
+            }
+            newPath += path;
+            return uri.Scheme + "://" + uri.Authority + newPath;
+        }
+
+        public static string ParseIssueAddress(string input, string repoaddr, string issuePath)
+        {
+            var regex = new Regex(@"\b(\w+\/)?\w+#\d+\b|\#\d+\b");
+            var matches = regex.Matches(input);
+            for (int i = 0; i < matches.Count; i++)
+            {
+                string m = matches[i].Value;
+                string[] issueGp = m.Split("#");
+                int issueNumber = int.Parse(issueGp[1]);
+
+                input = input.Replace(m, $"[{m}]({LinkBuilder(repoaddr, issueGp[0]) + issuePath + issueNumber})");
+            }
+            return input;
+        }
         public static string DateFormater(string dateString)
         {
             DateTime date;
@@ -135,7 +161,7 @@ namespace MyNamespace
                 }
 
                 // 匹配提交信息
-                if (tag_idx > -1)
+                if (canbewriten && tag_idx > -1)
                 {
                     foreach (CommitType cmt in config.committypes)
                     {
@@ -167,14 +193,33 @@ namespace MyNamespace
 
             // 构建文本内容
             string content = "";
+            Platform myPlatform = config.platform.FirstOrDefault(p => p.name == config.useplatform);
             for (int i = 0; i < tag_groups.Count; i++)
             {
-                content = content 
+                int t = (i + 1) % tag_groups.Count;
+
+                // 构建标签号
+                content = content
+                    + "\n## "
                     + tag_groups[i].TagName
-                    + $" ([{dte_ref}]())";
+                    + $" ([{dte_ref}]({remoteaddr}{myPlatform.tagbri}{tag_groups[i].TagName}...{tag_groups[t].TagName}))\n";
+
+                // 构建提交类型以及内容
+                foreach (TypedCommits tc in tag_groups[i].GroupedCommits)
+                {
+                    content = content
+                        + $"\n### {tc.Type}\n\n";
+
+                    foreach (string cm in tc.Values)
+                    {
+                        content = content
+                            + $"- {ParseIssueAddress(cm.Trim(), remoteaddr, myPlatform.issuebri)}\n";
+                    }
+
+                }
             }
 
-            return "";
+            return content;
         }
         static void Main(string[] args)
         {
@@ -182,10 +227,7 @@ namespace MyNamespace
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             string configpath = null;
-            for (int i = 0; i < args.Length; i++)
-            {
-                Console.WriteLine(args[i]);
-            }
+
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "-c" && i + 1 < args.Length)
@@ -215,12 +257,9 @@ namespace MyNamespace
                 var yaml = File.ReadAllText(configpath, Encoding.UTF8);
                 var deserializer = new DeserializerBuilder().Build();
                 var config = deserializer.Deserialize<CsogrcConfig>(yaml);
-                Console.WriteLine(yaml);
-                Console.WriteLine($"Name: {config.projpath}");
+
                 // 访问其他属性
-                Console.WriteLine($"进入目录：{config.projpath}");
                 Directory.SetCurrentDirectory(config.projpath);
-                Console.WriteLine($"Current directory: {Directory.GetCurrentDirectory()}");
 
                 ProcessStartInfo gittagpro = new ProcessStartInfo
                 {
@@ -260,34 +299,26 @@ namespace MyNamespace
                     process.Start();
                     string pattern = @"http.*git";
                     gitrepoaddress = process.StandardOutput.ReadToEnd().Split("\n")[0];
-                    Console.WriteLine($"{gitrepoaddress}");
+
                     Match match = Regex.Match(gitrepoaddress, pattern);
                     if (match.Success)
                     {
-                        Console.WriteLine("匹配成功");
                         gitrepoaddress = match.Value.Replace(".git", "");
                     }
                     process.WaitForExit();
-                    Console.WriteLine($"远程仓库：{gitrepoaddress}");
-
                     process.Close();
 
                     process.StartInfo = gittagpro;
                     process.Start();
                     string gittagstr = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
-                    Console.WriteLine(gittagstr);
                     tags = gittagstr.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    Console.WriteLine("-------------------------------");
-                    Console.WriteLine(tags[5]);
-
                     process.Close();
 
                     process.StartInfo = gitlogpro;
                     process.Start();
                     gitlogstr = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
-
                     process.Close();
                 }
 
@@ -297,11 +328,8 @@ namespace MyNamespace
 
                 using (StreamWriter writer = new StreamWriter(config.outputdir, false, Encoding.UTF8))
                 {
-                    writer.Write(header);
+                    writer.Write(header + content);
                 }
-
-                Console.WriteLine("字符串已输出到文件：" + config.outputdir);
-                Console.ReadKey();
             }
             catch (Exception ex)
             {
