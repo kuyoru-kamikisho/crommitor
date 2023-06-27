@@ -1,17 +1,4 @@
 useplatform: gitlab
-platform:
-  - name: gitlab
-    tagbri: /-/compare/
-    commitbri: /-/commit/
-    issuebri: /-/issues/
-  - name: github
-    tagbri: /compare/
-    commitbri: /commit/
-    issuebri: /issues/
-  - name: gitee
-    tagbri: /compare/
-    commitbri: /commit/
-    issuebri: /issues/
 projpath: E:\BPA\root
 branch: origin/main
 description: 这是一个changelog
