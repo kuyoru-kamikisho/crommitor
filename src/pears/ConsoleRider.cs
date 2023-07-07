@@ -104,6 +104,7 @@ namespace commitor.pears
             using (StreamWriter writer = new StreamWriter(_config.outputdir, false, Encoding.UTF8))
             {
                 writer.Write(header + content);
+                Console.WriteLine("Finished.");
             }
         }
     }

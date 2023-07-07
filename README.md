@@ -12,28 +12,67 @@
 
     [options]    [params] <optional> description
 
-    -c         [config file path] <?> support relative path & absolute path.
-               By default, query the config file named csogrc.yml in the directory
-               where the exe file is located. A changelog will be generated based on
-               the configuration file. At the same time, this configuration file
-               is also used by other functions, please refer to the configuration file
-               tutorial for more details.
-    -i         Install this little tool, this will register the path where the root path
-               is located in your user environment variables.
-    -u         To uninstall this gadget, unregister the file from your user environment variables.
-    -s         If you only want to generate a changelog file, you can append this command,
-               then it will be executed silently, and the cmd window will no longer pop up.
-    -v         Show the version.
-
-    
+    -c           [config file path] <?> support relative path & absolute path.
+                 By default, query the config file named csogrc.yml in the directory
+                 where the exe file is located. A changelog will be generated based on
+                 the configuration file. At the same time, this configuration file
+                 is also used by other functions, please refer to the configuration file
+                 tutorial for more details.
+    -s           If you only want to generate a changelog file, you can append this command,
+                 then it will be executed silently, and the cmd window will no longer pop up.
+    -v           Show the version.
+    -h, --help   Show the help info.
 
 ## 配置
 
-默认情况下我们使用主程序所在目录（简称根目录）下的`csogrc.yml`作为程序的配置文件，当您使用 `-c` 参数时，您指定的配置文件将被指定为有效配置文件，下面是关于该配置文件的示例及描述。
+默认情况下我们使用主程序所在目录（简称根目录）下的`csogrc.yml`作为程序的配置文件，当您使用 `-c`
+参数时，您指定的配置文件将被指定为有效配置文件，下面是关于该配置文件的示例及描述。
+
+### 一个完整的示例文件
 
 ```yml
-
+useplatform: gitlab
+projpath: E:\Projects\vsapps\commitor
+branch: origin/main
+description: 这是一个changelog
+title: ChangeLog Title
+committypes:
+  - value: fix
+    description: 修复了一些已知的问题或bug
+  - value: build
+    description: 改变了构建时的行为
+  - value: feat
+    description: 新增了一些功能特性
+  - value: config
+    description: 更改了配置文件，并未改变其它源码
+  - value: style
+    description: 更改了样式文件，并未改变其它源码
+  - value: docs
+    description: 增加或修改了一些文档，没有修改源码
+  - value: refactor
+    description: 对部分源码进行了重构，不影响现有功能
+onlyusers:
+  - value: kamikisho
+    description: null
+outputdir: ./changelog.md
 ```
+
+### 字段含义
+
+| Field                      | Type                      | Description |
+|----------------------------|---------------------------|-------------|
+| branch                     | `string`                  |             |
+| committypes                | `<{value,description}>[]` |             |
+| committypes[i].value       | `string`                  |             |
+| committypes[i].description | `string`                  |             |
+| description                | `string`                  |             |
+| onlyusers                  | `<{value,description}>[]` |             |
+| onlyusers[i].value         | `string`                  |             |
+| onlyusers[i].description   | `string`                  |             |
+| outputdir                  | `string`                  |             |
+| projpath                   | `string`                  |             |
+| title                      | `string`                  |             |
+| useplatform                | `string`                  |             |
 
 ## 对比其他工具
 

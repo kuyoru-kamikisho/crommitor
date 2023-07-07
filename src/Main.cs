@@ -15,15 +15,36 @@ namespace commitor
 
             for (var i = 0; i < args.Length; i++)
             {
-                if (args[i] == "-c" && i + 1 < args.Length)
+                if (args[i] == "-c")
                 {
-                    configpath = args[i + 1];
-                    break;
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
+                    {
+                        configpath = args[i + 1];
+                        i++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Argument '-c' with no path specified");
+                        Console.ReadKey();
+                    }
                 }
 
                 if (args[i] == "-s")
                 {
                     silent = true;
+                }
+
+                if (args[i] == "-h" || args[i] == "--help")
+                {
+                    App.HelpMe();
+                    return;
+                }
+
+                if (args[i] == "-v")
+                {
+                    Console.WriteLine(App.Version);
+                    Console.ReadKey();
+                    return;
                 }
             }
 
@@ -36,7 +57,6 @@ namespace commitor
             if (!File.Exists(configpath))
             {
                 Console.WriteLine($"Error: configFile '{configpath}' not found.");
-                Console.ReadKey();
                 return;
             }
 
@@ -60,7 +80,8 @@ namespace commitor
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine("Unexpected Error: " + ex.Message);
+                Console.WriteLine("You can report an issue in here: " + App.ReportIssue);
                 Console.ResetColor();
             }
         }

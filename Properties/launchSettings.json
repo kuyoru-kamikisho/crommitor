@@ -3,7 +3,7 @@
     "commitor": {
       "commandName": "Project",
       "commandLineArgs": "-c ./csogrc.yml",
-      "workingDirectory": "E:\\Projects\\vsapps\\commitor\\src"
+      "workingDirectory": "D:\\KDatas\\Ktychann\\crommitor\\src"
     }
   }
 }

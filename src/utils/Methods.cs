@@ -156,6 +156,7 @@ namespace commitor.utils
         {
             var canbewriten = false;
             var tagIdx = -1;
+            var hasAsked = false;
             var tagGroups = new List<CategorizedCommits>();
             var lines = commits.Split("\n");
             var comPtn = @"^commit\s.*";
@@ -185,6 +186,44 @@ namespace commitor.utils
                             });
                             tagIdx += 1;
                             continue;
+                        }
+                    }
+                }
+
+                if (tagIdx == -1 && !hasAsked)
+                {
+                    hasAsked = true;
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("It seems that the latest commit record of your current branch " +
+                                  "does not have any tag associated with it, " +
+                                  "do you want to define a virtual tag for these commits? " +
+                                  "The virtual tag will only appear in the final output file.");
+                    Console.ResetColor();
+                    Console.Write("(N");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    Console.Write("/Y");
+                    Console.ResetColor();
+                    Console.Write(", default N)\n");
+                    var cki = Console.ReadKey();
+                    var ckc = cki.KeyChar;
+                    Console.Clear();
+                    if (ckc is 'y' or 'Y')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("\nPlease enter a dummy version number " +
+                                          "which should be a new version number:");
+                        Console.ResetColor();
+                        var vTag = Console.ReadLine();
+                        Console.WriteLine("processing...");
+                        if (vTag != null)
+                        {
+                            tagGroups.Add(new CategorizedCommits
+                            {
+                                TagName = vTag,
+                                GroupedCommits = new List<TypedCommits>()
+                            });
+                            tagIdx += 1;
                         }
                     }
                 }

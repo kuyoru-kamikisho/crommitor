@@ -1,6 +1,6 @@
 useplatform: gitlab
-projpath: E:\Projects\vsapps\commitor
-branch: origin/main
+projpath: ./
+branch: origin/dev
 description: 这是一个changelog
 title: ChangeLog Title
 committypes:
