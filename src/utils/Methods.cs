@@ -17,13 +17,16 @@ namespace commitor.utils
                 while (choosing)
                 {
                     Console.Clear();
-                    Console.WriteLine("Select a commit type below:");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(
+                        "Choose a message type from below, use the arrow keys on the keyboard to select, and press Enter to confirm:\n");
+                    Console.ResetColor();
                     for (var i = 0; i < types.Length; i++)
                     {
                         var t = types[i];
                         if (i == selectedIndex)
                         {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.ForegroundColor = ConsoleColor.Blue;
                             Console.WriteLine($"\t{i + 1}. {t.value + ":",-12}{t.description}\u0332");
                             Console.ResetColor();
                         }
@@ -84,8 +87,10 @@ namespace commitor.utils
                 var process = new Process();
                 process.StartInfo = cmall;
                 process.Start();
+                var rte = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
                 process.Close();
+                Console.WriteLine(rte);
                 return true;
             }
             catch (Exception e)

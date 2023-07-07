@@ -61,6 +61,7 @@ namespace commitor
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error: " + ex.Message);
+                Console.ResetColor();
             }
         }
     }
