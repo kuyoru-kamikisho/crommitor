@@ -8,7 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="src\csogrc.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="13.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="src\csogrc.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="src\resources\repository.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

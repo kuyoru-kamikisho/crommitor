@@ -1,23 +1,21 @@
-﻿using commitor.src.utils;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using commitor.src.pears;
+using commitor.utils;
 
-namespace commitor.src.pears
+namespace commitor.pears
 {
     public class ConsoleRider
     {
-        ConfigType config;
-        List<Repository> repos;
+        ConfigType _config;
+        List<RepositoryInfo> _repos;
 
-        public ConsoleRider(ConfigType config,List<Repository> repos)
+        public ConsoleRider(ConfigType config, List<RepositoryInfo> repos)
         {
-            this.config=config;
-            this.repos = repos;
+            _config = config;
+            _repos = repos;
+            Hellow();
         }
 
         public void Hellow()
@@ -25,7 +23,7 @@ namespace commitor.src.pears
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\n Welcome to Crommitor 1.0.1!");
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(" If you just want to generate changelog, please use \"-s\" parameter.");
+            Console.WriteLine(" If you just want to generate changelog silently, please use \"-s\" parameter.");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(" Now you can enter a number to select the function you need or enter \"q\" to exit:\n");
             Console.ForegroundColor = ConsoleColor.Blue;
@@ -33,62 +31,63 @@ namespace commitor.src.pears
             Console.WriteLine(" 2. Create a commit message only");
             Console.WriteLine(" 3. Generate a changelog file");
             Console.ResetColor();
-            Console.ReadKey();
+
+            Console.Write("Input the number:");
+            var keyInfo = Console.ReadKey();
+            switch (keyInfo.KeyChar)
+            {
+                case 'q':
+                    return;
+                case '1':
+                    Methods.GitCommitAll(_config.committypes);
+                    break;
+                case '2':
+                    Methods.GitCommitAll(_config.committypes, true);
+                    break;
+                case '3':
+                    GenerateChangelog();
+                    break;
+            }
         }
+
         public void GenerateChangelog()
         {
-            ProcessStartInfo gittagpro = new ProcessStartInfo
+            var gitrepoaddresspro = new ProcessStartInfo
             {
                 FileName = "git",
-                Arguments = $"tag --sort=-creatordate",
+                Arguments = "remote -v",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            ProcessStartInfo gitrepoaddresspro = new ProcessStartInfo
+            var gitlogpro = new ProcessStartInfo
             {
                 FileName = "git",
-                Arguments = $"remote -v",
+                Arguments = $"log --decorate {_config.branch}",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            ProcessStartInfo gitlogpro = new ProcessStartInfo
-            {
-                FileName = "git",
-                Arguments = $"log --decorate {config.branch}",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            string header = "";
-            string content = "";
-            string gitlogstr = "";
-            string[] tags = { };
-            string gitrepoaddress = "";
-            using (Process process = new Process())
+            string header;
+            string content;
+            string gitlogstr;
+            string gitrepoaddress;
+            using (var process = new Process())
             {
                 process.StartInfo = gitrepoaddresspro;
                 process.Start();
-                string pattern = @"http.*git";
+                var pattern = @"http.*git";
                 gitrepoaddress = process.StandardOutput.ReadToEnd().Split("\n")[0];
 
-                Match match = Regex.Match(gitrepoaddress, pattern);
+                var match = Regex.Match(gitrepoaddress, pattern);
                 if (match.Success)
                 {
                     gitrepoaddress = match.Value.Replace(".git", "");
                 }
-                process.WaitForExit();
-                process.Close();
 
-                process.StartInfo = gittagpro;
-                process.Start();
-                string gittagstr = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
-                tags = gittagstr.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 process.Close();
 
                 process.StartInfo = gitlogpro;
@@ -98,11 +97,11 @@ namespace commitor.src.pears
                 process.Close();
             }
 
-            header = Methods.BuildHeader(config);
-            content = Methods.BuildContent(this.repos, gitlogstr, config, gitrepoaddress);
+            header = Methods.BuildHeader(_config);
+            content = Methods.BuildContent(this._repos, gitlogstr, _config, gitrepoaddress);
 
 
-            using (StreamWriter writer = new StreamWriter(config.outputdir, false, Encoding.UTF8))
+            using (StreamWriter writer = new StreamWriter(_config.outputdir, false, Encoding.UTF8))
             {
                 writer.Write(header + content);
             }

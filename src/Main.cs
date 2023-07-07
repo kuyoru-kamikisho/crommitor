@@ -1,27 +1,26 @@
-﻿using System.Diagnostics;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text;
+using commitor.pears;
 using YamlDotNet.Serialization;
 using commitor.src.pears;
-using commitor.src.utils;
 
 namespace commitor
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
-            string configpath = null;
+            string? configpath = null;
             var silent = false;
 
-            for (int i = 0; i < args.Length; i++)
+            for (var i = 0; i < args.Length; i++)
             {
                 if (args[i] == "-c" && i + 1 < args.Length)
                 {
                     configpath = args[i + 1];
                     break;
                 }
+
                 if (args[i] == "-s")
                 {
                     silent = true;
@@ -32,7 +31,6 @@ namespace commitor
             {
                 Console.WriteLine("Usage: csogrc.exe -c [config_path]");
                 configpath = "./csogrc.yml";
-                return;
             }
 
             if (!File.Exists(configpath))
@@ -44,19 +42,17 @@ namespace commitor
 
             try
             {
-                var regexYaml = new Regex(@"\.(yml|yaml)$", RegexOptions.IgnoreCase);
-
                 var repf = File.ReadAllText("./resources/repository.yml", Encoding.UTF8);
                 var cfgf = File.ReadAllText(configpath, Encoding.UTF8);
                 var deserializer = new DeserializerBuilder().Build();
                 var config = deserializer.Deserialize<ConfigType>(cfgf);
-                var repos = deserializer.Deserialize<List<Repository>>(repf);
+                var repos = deserializer.Deserialize<Repositories>(repf);
 
                 Directory.SetCurrentDirectory(config.projpath);
 
-                var cri = new ConsoleRider(config, repos);
+                var cri = new ConsoleRider(config, repos.platform);
 
-                if(silent)
+                if (silent)
                 {
                     cri.GenerateChangelog();
                 }
@@ -67,6 +63,5 @@ namespace commitor
                 Console.WriteLine("Error: " + ex.Message);
             }
         }
-
     }
 }

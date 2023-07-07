@@ -1,23 +1,110 @@
-﻿using commitor.src.pears;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using commitor.pears;
+using commitor.src.pears;
 
-namespace commitor.src.utils
+namespace commitor.utils
 {
     public static class Methods
     {
+        public static bool GitCommitAll(CommitType[] types, bool onlyCommit = false)
+        {
+            try
+            {
+                string msg;
+                var selectedIndex = 0;
+                var choosing = true;
+                while (choosing)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Select a commit type below:");
+                    for (var i = 0; i < types.Length; i++)
+                    {
+                        var t = types[i];
+                        if (i == selectedIndex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine($"\t{i + 1}. {t.value + ":",-12}{t.description}\u0332");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.WriteLine($"\t{i + 1}. {t.value + ":",-12}{t.description}");
+                        }
+                    }
+
+                    // 监听用户按键
+                    var keyInfo = Console.ReadKey(true);
+
+                    // 根据按键进行相应操作
+                    switch (keyInfo.Key)
+                    {
+                        case ConsoleKey.UpArrow:
+                            selectedIndex = (selectedIndex - 1 + types.Length) % types.Length;
+                            break;
+                        case ConsoleKey.DownArrow:
+                            selectedIndex = (selectedIndex + 1) % types.Length;
+                            break;
+                        case ConsoleKey.Enter:
+                            Console.Clear();
+                            choosing = false;
+                            break;
+                    }
+                }
+
+                var initStr = types[selectedIndex].value + ": ";
+                var msgInput = string.Empty;
+                while (string.IsNullOrWhiteSpace(msgInput))
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("Write a short commit message:");
+                    Console.ResetColor();
+                    Console.Write(initStr);
+                    msgInput = Console.ReadLine();
+                    if (!string.IsNullOrWhiteSpace(msgInput)) continue;
+                    Console.Clear();
+                    Console.WriteLine("At least one piece of information is required, please re-enter.");
+                }
+
+                msg = initStr + msgInput;
+                var ags = "-am";
+                if (onlyCommit)
+                {
+                    ags = "-m";
+                }
+
+                var cmall = new ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = $"commit {ags} \"{msg}\"",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                var process = new Process();
+                process.StartInfo = cmall;
+                process.Start();
+                process.WaitForExit();
+                process.Close();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+        }
+
         public static string LinkBuilder(string url, string path)
         {
-            Uri uri = new Uri(url);
-            string newPath = "";
-            if (uri.AbsolutePath.LastIndexOf("/") > 0)
+            var uri = new Uri(url);
+            var newPath = "";
+            if (uri.AbsolutePath.LastIndexOf("/", StringComparison.Ordinal) > 0)
             {
-                newPath = uri.AbsolutePath.Substring(0, uri.AbsolutePath.LastIndexOf("/")) + "/";
+                newPath = string.Concat(
+                    uri.AbsolutePath.AsSpan(0, uri.AbsolutePath.LastIndexOf("/", StringComparison.Ordinal)), "/");
             }
+
             newPath += path;
             return uri.Scheme + "://" + uri.Authority + newPath;
         }
@@ -34,14 +121,16 @@ namespace commitor.src.utils
 
                 input = input.Replace(m, $"[{m}]({LinkBuilder(repoaddr, issueGp[0]) + issuePath + issueNumber})");
             }
+
             return input;
         }
+
         public static string DateFormater(string dateString)
         {
             DateTime date;
             if (DateTime.TryParseExact(dateString, "ddd MMM d HH:mm:ss yyyy zzz",
-                                       System.Globalization.CultureInfo.InvariantCulture,
-                                       System.Globalization.DateTimeStyles.None, out date))
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out date))
             {
                 return date.ToString("yyyy-MM-dd");
             }
@@ -56,57 +145,52 @@ namespace commitor.src.utils
             string header1 = $"# {config.title}\n\n{config.description}\n";
             return header1;
         }
-        public static string BuildContent(List<Repository> repos, string commits, ConfigType config, string remoteaddr)
+
+        public static string BuildContent(List<RepositoryInfo> repos, string commits, ConfigType config,
+            string remoteaddr)
         {
-            bool canbewriten = false;
-            int tag_idx = -1;
-            var tag_groups = new List<CategorizedCommits>();
-            string[] lines = commits.Split("\n");
-            string com_ptn = @"^commit\s.*";
-            string tag_ptn = @"tag:\s.*\)";
-            string tag_get = @"tag:\s([^,\n\)]+)";
-            string aor_ptn = @"Author:\s+(\w+\.\w+)";
-            string dte_ptn = @"Date:\s([^\n]+)";
-            string isu_ptn = @"#\d+";
-            string msg_ptn = @"\s{4}^(.*)";
-            string cmt_ref = "";
-            string cmt_fnk = "";
-            string aor_ref = "";
-            string dte_ref = "";
+            var canbewriten = false;
+            var tagIdx = -1;
+            var tagGroups = new List<CategorizedCommits>();
+            var lines = commits.Split("\n");
+            var comPtn = @"^commit\s.*";
+            var tagPtn = @"tag:\s.*\)";
+            var tagGet = @"tag:\s([^,\n\)]+)";
+            var aorPtn = @"Author:\s+(\w+\.\w+)";
+            var dtePtn = @"Date:\s([^\n]+)";
+            var dteRef = "";
+            string aorRef;
 
             foreach (string line in lines)
             {
-
                 // 匹配commit信息（tag）
-                Match com_mtc = Regex.Match(line, com_ptn);
-                if (com_mtc.Success)
+                Match comMtc = Regex.Match(line, comPtn);
+                if (comMtc.Success)
                 {
-                    cmt_ref = com_mtc.Value.Substring(7, 7);
-                    cmt_fnk = com_mtc.Value.Split(" ")[1];
-                    Match tag_mtc = Regex.Match(com_mtc.Value, tag_ptn);
-                    if (tag_mtc.Success)
+                    var tagMtc = Regex.Match(comMtc.Value, tagPtn);
+                    if (tagMtc.Success)
                     {
-                        Match tag_mtg = Regex.Match(tag_mtc.Value, tag_get);
-                        if (tag_mtg.Success)
+                        var tagMtg = Regex.Match(tagMtc.Value, tagGet);
+                        if (tagMtg.Success)
                         {
-                            tag_groups.Add(new CategorizedCommits
+                            tagGroups.Add(new CategorizedCommits
                             {
-                                TagName = tag_mtg.Groups[1].Value,
+                                TagName = tagMtg.Groups[1].Value,
                                 GroupedCommits = new List<TypedCommits>()
                             });
-                            tag_idx += 1;
+                            tagIdx += 1;
                             continue;
                         }
                     }
                 }
 
                 // 匹配作者
-                Match aot_mtc = Regex.Match(line, aor_ptn);
-                if (aot_mtc.Success)
+                Match aotMtc = Regex.Match(line, aorPtn);
+                if (aotMtc.Success)
                 {
-                    aor_ref = aot_mtc.Groups[1].Value;
+                    aorRef = aotMtc.Groups[1].Value;
 
-                    if (config.onlyusers.Any(o => o.value == aor_ref))
+                    if (config.onlyusers.Any(o => o.value == aorRef))
                     {
                         canbewriten = true;
                     }
@@ -114,31 +198,32 @@ namespace commitor.src.utils
                     {
                         canbewriten = false;
                     }
+
                     continue;
                 }
 
                 // 匹配日期
-                Match dte_mtc = Regex.Match(line, dte_ptn);
-                if (dte_mtc.Success)
+                Match dteMtc = Regex.Match(line, dtePtn);
+                if (dteMtc.Success)
                 {
-                    dte_ref = DateFormater(dte_mtc.Value.Substring(8));
+                    dteRef = DateFormater(dteMtc.Value.Substring(8));
                     continue;
                 }
 
                 // 匹配提交信息
-                if (canbewriten && tag_idx > -1)
+                if (canbewriten && tagIdx > -1)
                 {
                     foreach (CommitType cmt in config.committypes)
                     {
                         if (line.Trim().StartsWith(cmt.value))
                         {
-                            if (tag_groups.Count > tag_idx)
+                            if (tagGroups.Count > tagIdx)
                             {
-                                List<TypedCommits> now_types = tag_groups[tag_idx].GroupedCommits;
-                                int i = now_types.FindIndex(o => o.Type == cmt.value);
+                                List<TypedCommits> nowTypes = tagGroups[tagIdx].GroupedCommits;
+                                int i = nowTypes.FindIndex(o => o.Type == cmt.value);
                                 if (i == -1)
                                 {
-                                    now_types.Add(new TypedCommits
+                                    nowTypes.Add(new TypedCommits
                                     {
                                         Type = cmt.value,
                                         TypeDescription = cmt.description,
@@ -147,9 +232,10 @@ namespace commitor.src.utils
                                 }
                                 else
                                 {
-                                    now_types[i].Values.Add(line);
+                                    nowTypes[i].Values.Add(line);
                                 }
                             }
+
                             break;
                         }
                     }
@@ -158,29 +244,28 @@ namespace commitor.src.utils
 
             // 构建文本内容
             string content = "";
-            Repository myPlatform = repos.FirstOrDefault(p => p.name == config.useplatform);
-            for (int i = 0; i < tag_groups.Count; i++)
+            var myPlatform = repos.FirstOrDefault(p => p.name == config.useplatform) ?? null;
+            for (int i = 0; i < tagGroups.Count; i++)
             {
-                int t = (i + 1) % tag_groups.Count;
+                int t = (i + 1) % tagGroups.Count;
 
                 // 构建标签号
                 content = content
-                    + "\n## "
-                    + tag_groups[i].TagName
-                    + $" ([{dte_ref}]({remoteaddr}{myPlatform.tagbri}{tag_groups[i].TagName}...{tag_groups[t].TagName}))\n";
+                          + "\n## "
+                          + tagGroups[i].TagName
+                          + $" ([{dteRef}]({remoteaddr}{myPlatform?.tagbri}{tagGroups[i].TagName}...{tagGroups[t].TagName}))\n";
 
                 // 构建提交类型以及内容
-                foreach (TypedCommits tc in tag_groups[i].GroupedCommits)
+                foreach (TypedCommits tc in tagGroups[i].GroupedCommits)
                 {
                     content = content
-                        + $"\n### {tc.Type}\n\n";
+                              + $"\n### {tc.Type}\n\n";
 
                     foreach (string cm in tc.Values)
                     {
                         content = content
-                            + $"- {ParseIssueAddress(cm.Trim(), remoteaddr, myPlatform.issuebri)}\n";
+                                  + $"- {ParseIssueAddress(cm.Trim(), remoteaddr, myPlatform!.issuebri)}\n";
                     }
-
                 }
             }
 

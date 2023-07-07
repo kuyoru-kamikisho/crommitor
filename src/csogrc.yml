@@ -1,16 +1,24 @@
 useplatform: gitlab
-projpath: E:\BPA\root
+projpath: E:\Projects\vsapps\commitor
 branch: origin/main
 description: 这是一个changelog
 title: ChangeLog Title
 committypes:
   - value: fix
-    description: 修复了一些内容
+    description: 修复了一些已知的问题或bug
   - value: build
-    description: 构建行为修改
+    description: 改变了构建时的行为
+  - value: feat
+    description: 新增了一些功能特性
+  - value: config
+    description: 更改了配置文件，并未改变其它源码
+  - value: style
+    description: 更改了样式文件，并未改变其它源码
+  - value: docs
+    description: 增加或修改了一些文档，没有修改源码
+  - value: refactor
+    description: 对部分源码进行了重构，不影响现有功能
 onlyusers:
-  - value: lijie.xin
-    description: 前端开发
-  - value: jiuxiang
-    description: 后端开发
-outputdir: ./UI/changelog.md
+  - value: kamikisyo
+    description: null
+outputdir: ./changelog.md

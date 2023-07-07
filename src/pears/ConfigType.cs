@@ -1,4 +1,4 @@
-﻿namespace commitor.src.pears
+﻿namespace commitor.pears
 {
     public class CommitType
     {
