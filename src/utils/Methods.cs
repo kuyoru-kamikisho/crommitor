@@ -14,16 +14,23 @@ namespace commitor.utils
                 string msg;
                 var selectedIndex = 0;
                 var choosing = true;
+                var back = new CommitType
+                {
+                    value = "Back",
+                    description = "Cancel commit"
+                };
+                var list = types.Concat(new[] { back }).ToArray();
                 while (choosing)
                 {
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine(
-                        "Choose a message type from below, use the arrow keys on the keyboard to select, and press Enter to confirm:\n");
+                    Console.WriteLine("Choose a message type from below, " +
+                                      "use the arrow keys on the keyboard to select," +
+                                      " and press Enter to confirm:\n");
                     Console.ResetColor();
-                    for (var i = 0; i < types.Length; i++)
+                    for (var i = 0; i < list.Length; i++)
                     {
-                        var t = types[i];
+                        var t = list[i];
                         if (i == selectedIndex)
                         {
                             Console.ForegroundColor = ConsoleColor.Blue;
@@ -43,10 +50,10 @@ namespace commitor.utils
                     switch (keyInfo.Key)
                     {
                         case ConsoleKey.UpArrow:
-                            selectedIndex = (selectedIndex - 1 + types.Length) % types.Length;
+                            selectedIndex = (selectedIndex - 1 + list.Length) % list.Length;
                             break;
                         case ConsoleKey.DownArrow:
-                            selectedIndex = (selectedIndex + 1) % types.Length;
+                            selectedIndex = (selectedIndex + 1) % list.Length;
                             break;
                         case ConsoleKey.Enter:
                             Console.Clear();
@@ -55,63 +62,68 @@ namespace commitor.utils
                     }
                 }
 
-                var initStr = types[selectedIndex].value + ": ";
-                var msgInput = string.Empty;
-                while (string.IsNullOrWhiteSpace(msgInput))
+                if (selectedIndex != list.Length - 1)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine("Write a short commit message:");
-                    Console.ResetColor();
-                    Console.Write(initStr);
-                    msgInput = Console.ReadLine();
-                    if (!string.IsNullOrWhiteSpace(msgInput)) continue;
-                    Console.Clear();
-                    Console.WriteLine("At least one piece of information is required, please re-enter.");
-                }
+                    var initStr = types[selectedIndex].value + ": ";
+                    var msgInput = string.Empty;
+                    while (string.IsNullOrWhiteSpace(msgInput))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine("Write a short commit message:");
+                        Console.ResetColor();
+                        Console.Write(initStr);
+                        msgInput = Console.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(msgInput)) continue;
+                        Console.Clear();
+                        Console.WriteLine("At least one piece of information is required, please re-enter.");
+                    }
 
-                msg = initStr + msgInput;
-                var cmall = new ProcessStartInfo
-                {
-                    FileName = "git",
-                    Arguments = "add -A",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                var cmomi = new ProcessStartInfo
-                {
-                    FileName = "git",
-                    Arguments = $"commit -m \"{msg}\"",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+                    msg = initStr + msgInput;
+                    var cmall = new ProcessStartInfo
+                    {
+                        FileName = "git",
+                        Arguments = "add -A",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    var cmomi = new ProcessStartInfo
+                    {
+                        FileName = "git",
+                        Arguments = $"commit -m \"{msg}\"",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
 
-                string output;
-                using var process = new Process();
-                string currentDirectory = Environment.CurrentDirectory;
-                Console.WriteLine("当前程序运行目录：" + currentDirectory);
-                if (onlyCommit)
-                {
-                    process.StartInfo = cmomi;
-                    process.Start();
-                    output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
-                    process.Close();
-                    Console.WriteLine(output);
+                    string output;
+                    using var process = new Process();
+                    if (onlyCommit)
+                    {
+                        process.StartInfo = cmomi;
+                        process.Start();
+                        output = process.StandardOutput.ReadToEnd();
+                        process.WaitForExit();
+                        process.Close();
+                        Console.WriteLine(output);
+                    }
+                    else
+                    {
+                        process.StartInfo = cmall;
+                        process.Start();
+                        process.WaitForExit();
+                        process.Close();
+                        process.StartInfo = cmomi;
+                        process.Start();
+                        output = process.StandardOutput.ReadToEnd();
+                        process.WaitForExit();
+                        process.Close();
+                        Console.WriteLine(output);
+                    }
                 }
                 else
                 {
-                    process.StartInfo = cmall;
-                    process.Start();
-                    process.WaitForExit();
-                    process.Close();
-                    process.StartInfo = cmomi;
-                    process.Start();
-                    output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
-                    process.Close();
-                    Console.WriteLine(output);
+                    App.ConsoleEntry.Hellow();
                 }
             }
             catch (Exception e)
@@ -225,10 +237,9 @@ namespace commitor.utils
                     Console.Write("/Y");
                     Console.ResetColor();
                     Console.Write(", default N)\n");
-                    var cki = Console.ReadKey();
-                    var ckc = cki.KeyChar;
+                    var cki = Console.ReadLine();
                     Console.Clear();
-                    if (ckc is 'y' or 'Y')
+                    if (cki is "y" or "Y")
                     {
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("\nPlease enter a dummy version number " +

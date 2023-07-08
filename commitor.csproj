@@ -16,15 +16,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Include="src\csogrc.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Page>
+    <Resource Include="src\csogrc.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="src\resources\repository.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Remove="src\resources\assist" />
+    <Resource Include="src\resources\assist">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <None Remove="src\resources\repository.yml" />
+    <Resource Include="src\resources\repository.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

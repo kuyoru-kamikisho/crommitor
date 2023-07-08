@@ -1,6 +1,6 @@
 useplatform: gitlab
 projpath: ./
-branch: origin/dev
+branch: origin/main
 description: 这是一个changelog
 title: ChangeLog Title
 committypes:

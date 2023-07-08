@@ -25,7 +25,6 @@ namespace commitor
                     else
                     {
                         Console.WriteLine("Argument '-c' with no path specified");
-                        Console.ReadKey();
                     }
                 }
 
@@ -43,7 +42,6 @@ namespace commitor
                 if (args[i] == "-v")
                 {
                     Console.WriteLine(App.Version);
-                    Console.ReadKey();
                     return;
                 }
             }
@@ -70,11 +68,12 @@ namespace commitor
 
                 Directory.SetCurrentDirectory(config.projpath);
 
-                var cri = new ConsoleRider(config, repos.platform);
+                App.ConsoleEntry = new ConsoleRider(config, repos.platform);
+                App.ConsoleEntry.Hellow();
 
                 if (silent)
                 {
-                    cri.GenerateChangelog();
+                    App.ConsoleEntry.GenerateChangelog();
                 }
             }
             catch (Exception ex)

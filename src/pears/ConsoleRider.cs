@@ -15,7 +15,6 @@ namespace commitor.pears
         {
             _config = config;
             _repos = repos;
-            Hellow();
         }
 
         public void Hellow()
