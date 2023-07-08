@@ -1,15 +1,20 @@
-﻿using System.Text;
-using commitor.pears;
+﻿using System.Reflection;
+using System.Text;
+using comi.pears;
+using comi.src.pears;
 using YamlDotNet.Serialization;
-using commitor.src.pears;
 
-namespace commitor
+namespace comi
 {
     class Program
     {
         private static void Main(string[] args)
         {
+            var location = Assembly.GetExecutingAssembly().Location;
+            var directory = Path.GetDirectoryName(location);
+            
             Console.OutputEncoding = Encoding.UTF8;
+
             string? configpath = null;
             var silent = false;
 
@@ -50,6 +55,12 @@ namespace commitor
             {
                 Console.WriteLine("Usage: csogrc.exe -c [config_path]");
                 configpath = "./csogrc.yml";
+                if (directory != null)
+                {
+                    var filePath = Path.Combine(directory, configpath);
+                    var fullPath = Path.GetFullPath(filePath);
+                    configpath = fullPath;
+                }
             }
 
             if (!File.Exists(configpath))
@@ -60,7 +71,9 @@ namespace commitor
 
             try
             {
-                var repf = File.ReadAllText("./resources/repository.yml", Encoding.UTF8);
+                var filePath = Path.Combine(directory, "./resources/repository.yml");
+                var fullPath = Path.GetFullPath(filePath);
+                var repf = File.ReadAllText(fullPath, Encoding.UTF8);
                 var cfgf = File.ReadAllText(configpath, Encoding.UTF8);
                 var deserializer = new DeserializerBuilder().Build();
                 var config = deserializer.Deserialize<ConfigType>(cfgf);

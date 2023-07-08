@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-using commitor.src.pears;
-using commitor.utils;
+using comi.src.pears;
+using comi.utils;
 
-namespace commitor.pears
+namespace comi.pears
 {
     public class ConsoleRider
     {

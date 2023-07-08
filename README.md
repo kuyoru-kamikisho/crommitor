@@ -6,6 +6,15 @@
 
 <hr>
 
+## 使用
+
+1. 前往[release](https://github.com/kuyoru-kamikisho/crommitor/releases)界面下载最新程序
+2. 使用[7-zip](https://www.7-zip.org/)等解压程序解压本程序，您可以解压到任何位置，不过建议您解压到一个专门用于存放应用程序的目录
+3. 到这里您已经得到了程序的包体，您可以直接执行`comi.exe`来运行程序，也可以继续下面的步骤
+3. 执行`inst.exe`会将该程序添加到您的用户环境变量，这样您就可以在任何地方使用本程序了
+4. 打开一个命令行窗口，执行`comi -v`，看到版本号即代表可以使用
+5. 想卸载时可以执行`unins.exe`，注意，这只会将程序从环境变量中移除
+
 ## 参数
 
 这个exe文件可以接受以下参数：
@@ -18,10 +27,10 @@
                  the configuration file. At the same time, this configuration file
                  is also used by other functions, please refer to the configuration file
                  tutorial for more details.
-    -s           If you only want to generate a changelog file, you can append this command,
+    -s           <?> If you only want to generate a changelog file, you can append this command,
                  then it will be executed silently, and the cmd window will no longer pop up.
-    -v           Show the version.
-    -h, --help   Show the help info.
+    -v           <?> Show the version.
+    -h, --help   <?> Show the help info.
 
 ## 配置
 

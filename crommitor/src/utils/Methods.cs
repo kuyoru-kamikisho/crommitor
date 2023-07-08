@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
-using commitor.pears;
-using commitor.src.pears;
+using comi.pears;
+using comi.src.pears;
 
-namespace commitor.utils
+namespace comi.utils
 {
     public static class Methods
     {

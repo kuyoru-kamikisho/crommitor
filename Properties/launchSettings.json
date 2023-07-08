@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "commitor": {
-      "commandName": "Project",
-      "commandLineArgs": "-c ./csogrc.yml",
-      "workingDirectory": "D:\\KDatas\\Ktychann\\crommitor\\src"
-    }
-  }
-}
