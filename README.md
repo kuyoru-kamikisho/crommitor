@@ -18,10 +18,10 @@
                  the configuration file. At the same time, this configuration file
                  is also used by other functions, please refer to the configuration file
                  tutorial for more details.
-    -s           If you only want to generate a changelog file, you can append this command,
+    -s           <?> If you only want to generate a changelog file, you can append this command,
                  then it will be executed silently, and the cmd window will no longer pop up.
-    -v           Show the version.
-    -h, --help   Show the help info.
+    -v           <?> Show the version.
+    -h, --help   <?> Show the help info.
 
 ## 配置
 
