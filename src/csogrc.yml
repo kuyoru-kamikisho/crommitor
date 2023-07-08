@@ -18,7 +18,5 @@ committypes:
     description: 增加或修改了一些文档，没有修改源码
   - value: refactor
     description: 对部分源码进行了重构，不影响现有功能
-onlyusers:
-  - value: kamikisyo
-    description: null
+onlyusers: []
 outputdir: ./changelog.md
