@@ -81,7 +81,7 @@ namespace commitor.utils
                 var cmomi = new ProcessStartInfo
                 {
                     FileName = "git",
-                    Arguments = $"commit -m {msg}",
+                    Arguments = $"commit -m \"{msg}\"",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
