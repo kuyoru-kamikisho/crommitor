@@ -8,7 +8,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="src\csogrc.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="13.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="src\csogrc.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="src\resources\assist" />
+    <Resource Include="src\resources\assist">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <None Remove="src\resources\repository.yml" />
+    <Resource Include="src\resources\repository.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

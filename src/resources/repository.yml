@@ -1,0 +1,13 @@
+platform:
+  - name: gitlab
+    tagbri: /-/compare/
+    commitbri: /-/commit/
+    issuebri: /-/issues/
+  - name: github
+    tagbri: /compare/
+    commitbri: /commit/
+    issuebri: /issues/
+  - name: gitee
+    tagbri: /compare/
+    commitbri: /commit/
+    issuebri: /issues/
