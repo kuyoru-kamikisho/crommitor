@@ -7,7 +7,7 @@ namespace commitor.utils
 {
     public static class Methods
     {
-        public static bool GitCommitAll(CommitType[] types, bool onlyCommit = false)
+        public static void GitCommitAll(CommitType[] types, bool onlyCommit = false)
         {
             try
             {
@@ -70,33 +70,53 @@ namespace commitor.utils
                 }
 
                 msg = initStr + msgInput;
-                var ags = "-am";
-                if (onlyCommit)
-                {
-                    ags = "-m";
-                }
-
                 var cmall = new ProcessStartInfo
                 {
                     FileName = "git",
-                    Arguments = $"commit {ags} \"{msg}\"",
+                    Arguments = "add -A",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
-                var process = new Process();
-                process.StartInfo = cmall;
-                process.Start();
-                var rte = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
-                process.Close();
-                Console.WriteLine(rte);
-                return true;
+                var cmomi = new ProcessStartInfo
+                {
+                    FileName = "git",
+                    Arguments = $"commit -m {msg}",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                string output;
+                using var process = new Process();
+                string currentDirectory = Environment.CurrentDirectory;
+                Console.WriteLine("当前程序运行目录：" + currentDirectory);
+                if (onlyCommit)
+                {
+                    process.StartInfo = cmomi;
+                    process.Start();
+                    output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+                    process.Close();
+                    Console.WriteLine(output);
+                }
+                else
+                {
+                    process.StartInfo = cmall;
+                    process.Start();
+                    process.WaitForExit();
+                    process.Close();
+                    process.StartInfo = cmomi;
+                    process.Start();
+                    output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+                    process.Close();
+                    Console.WriteLine(output);
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                return false;
+                Console.WriteLine(e + "\n");
             }
         }
 

@@ -20,33 +20,65 @@ namespace commitor.pears
 
         public void Hellow()
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("\n Welcome to Crommitor 1.0.1!");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(" If you just want to generate changelog silently, please use \"-s\" parameter.");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(" Now you can enter a number to select the function you need or enter \"q\" to exit:\n");
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine(" 1. Add all changed files to the cache and create a commit message");
-            Console.WriteLine(" 2. Create a commit message only");
-            Console.WriteLine(" 3. Generate a changelog file");
-            Console.ResetColor();
-
-            Console.Write("Input the number:");
-            var keyInfo = Console.ReadKey();
-            switch (keyInfo.KeyChar)
+            string[] options =
             {
-                case 'q':
-                    return;
-                case '1':
-                    Methods.GitCommitAll(_config.committypes);
-                    break;
-                case '2':
-                    Methods.GitCommitAll(_config.committypes, true);
-                    break;
-                case '3':
-                    GenerateChangelog();
-                    break;
+                "Add all changed files to the cache and create a commit message",
+                "Create a commit message only",
+                "Generate a changelog file",
+                "Exit"
+            };
+            var chooseN = 0;
+            while (true)
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\nWelcome to Crommitor {App.Version}!");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("If you just want to generate changelog silently, please use \"-s\" parameter.");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Now you can use the arrow keys on the keyboard" +
+                                  " to select the following functions:\n");
+                Console.ResetColor();
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == chooseN)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine($"{i + 1}. {options[i]} ←");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{i + 1}. {options[i]}");
+                    }
+                }
+
+                var keyInfo = Console.ReadKey(true);
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        chooseN = (chooseN - 1 + options.Length) % options.Length;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        chooseN = (chooseN + 1) % options.Length;
+                        break;
+                    case ConsoleKey.Enter:
+                        Console.Clear();
+                        switch (chooseN)
+                        {
+                            case 0:
+                                Methods.GitCommitAll(_config.committypes);
+                                break;
+                            case 1:
+                                Methods.GitCommitAll(_config.committypes, true);
+                                break;
+                            case 2:
+                                GenerateChangelog();
+                                break;
+                        }
+
+                        return;
+                }
             }
         }
 
