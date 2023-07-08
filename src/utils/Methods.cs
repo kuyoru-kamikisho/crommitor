@@ -187,6 +187,7 @@ namespace commitor.utils
             string remoteaddr)
         {
             var canbewriten = false;
+            var ignoreuser = false;
             var tagIdx = -1;
             var hasAsked = false;
             var tagGroups = new List<CategorizedCommits>();
@@ -198,6 +199,12 @@ namespace commitor.utils
             var dtePtn = @"Date:\s([^\n]+)";
             var dteRef = "";
             string aorRef;
+
+            if (config.onlyusers.Length == 0)
+            {
+                ignoreuser = true;
+                canbewriten = true;
+            }
 
             foreach (string line in lines)
             {
@@ -260,21 +267,24 @@ namespace commitor.utils
                 }
 
                 // 匹配作者
-                Match aotMtc = Regex.Match(line, aorPtn);
-                if (aotMtc.Success)
+                if (!ignoreuser)
                 {
-                    aorRef = aotMtc.Groups[1].Value;
-
-                    if (config.onlyusers.Any(o => o.value == aorRef))
+                    Match aotMtc = Regex.Match(line, aorPtn);
+                    if (aotMtc.Success)
                     {
-                        canbewriten = true;
-                    }
-                    else
-                    {
-                        canbewriten = false;
-                    }
+                        aorRef = aotMtc.Groups[1].Value;
 
-                    continue;
+                        if (config.onlyusers.Any(o => o.value == aorRef))
+                        {
+                            canbewriten = true;
+                        }
+                        else
+                        {
+                            canbewriten = false;
+                        }
+
+                        continue;
+                    }
                 }
 
                 // 匹配日期
