@@ -7,7 +7,7 @@ public static class App
     public static ConsoleRider ConsoleEntry { set; get; }
     public static string ToolName = "Crommitor";
     public static string Date = "2023-7-7";
-    public static string Version = "1.1.0";
+    public static string Version = "1.1.1";
     public static string Author = "kuyoru-kamikisho";
     public static string ProjectAddress = "https://github.com/kuyoru-kamikisho/crommitor";
     public static string ReportIssue = "https://github.com/kuyoru-kamikisho/crommitor/issues";

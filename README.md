@@ -61,7 +61,7 @@ outputdir: ./changelog.md
 
 | Field                      | Type                      | Description                                                                         |
 |----------------------------|---------------------------|-------------------------------------------------------------------------------------|
-| branch                     | `string`                  | branch name                                                                         |
+| branch                     | `string`                  | read log of branch name, if empty string, read local branch                         |
 | committypes                | `<{value,description}>[]` |                                                                                     |
 | committypes[i].value       | `string`                  | type string                                                                         |
 | committypes[i].description | `string`                  | type info                                                                           |
