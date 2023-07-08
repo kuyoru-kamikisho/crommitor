@@ -1,4 +1,4 @@
-﻿namespace commitor.src.pears
+﻿namespace comi.src.pears
 {
     public class RepositoryInfo
     {

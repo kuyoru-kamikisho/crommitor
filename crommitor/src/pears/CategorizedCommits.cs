@@ -1,4 +1,4 @@
-﻿namespace commitor.pears
+﻿namespace comi.pears
 {
     public class TypedCommits
     {
