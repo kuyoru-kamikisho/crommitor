@@ -197,7 +197,6 @@ namespace comi.utils
             var tagGet = @"tag:\s([^,\n\)]+)";
             var aorPtn = @"Author:\s+(\w+\.\w+)";
             var dtePtn = @"Date:\s([^\n]+)";
-            var dteRef = "";
             string aorRef;
 
             if (config.onlyusers.Length == 0)
@@ -288,10 +287,12 @@ namespace comi.utils
                 }
 
                 // 匹配日期
+                var dteRef = "date of tag";
                 Match dteMtc = Regex.Match(line, dtePtn);
                 if (dteMtc.Success)
                 {
                     dteRef = DateFormater(dteMtc.Value.Substring(8));
+                    tagGroups[tagIdx].TagDate = dteRef;
                     continue;
                 }
 
@@ -338,7 +339,7 @@ namespace comi.utils
                 content = content
                           + "\n## "
                           + tagGroups[i].TagName
-                          + $" ([{dteRef}]({remoteaddr}{myPlatform?.tagbri}{tagGroups[i].TagName}...{tagGroups[t].TagName}))\n";
+                          + $" ([{tagGroups[i].TagDate}]({remoteaddr}{myPlatform?.tagbri}{tagGroups[i].TagName}...{tagGroups[t].TagName}))\n";
 
                 // 构建提交类型以及内容
                 foreach (TypedCommits tc in tagGroups[i].GroupedCommits)

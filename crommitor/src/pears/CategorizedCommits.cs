@@ -9,6 +9,7 @@
     public class CategorizedCommits
     {
         public string TagName { get; set; }
+        public string TagDate { get; set; }
         public List<TypedCommits> GroupedCommits { get; set; }
     }
 }

@@ -2,7 +2,29 @@
 
 这是一个changelog
 
-## 1.1.0 ([2023-06-15](https://github.com/kuyoru-kamikisho/crommitor/-/compare/1.1.0...1.0.0))
+## 1.1.21 ([2023-07-08](https://github.com/kuyoru-kamikisho/crommitor/-/compare/1.1.21...1.1.2))
+
+### fix
+
+- fix: [#3](https://github.com/kuyoru-kamikisho//-/issues/3)
+
+### docs
+
+- docs: img move
+
+## 1.1.2 ([2023-07-08](https://github.com/kuyoru-kamikisho/crommitor/-/compare/1.1.2...1.1.1))
+
+### feat
+
+- feat: Added support for user environment variables
+
+## 1.1.1 ([2023-07-08](https://github.com/kuyoru-kamikisho/crommitor/-/compare/1.1.1...1.1.0))
+
+### fix
+
+- fix: onlyusers empty condition
+
+## 1.1.0 ([2023-06-26](https://github.com/kuyoru-kamikisho/crommitor/-/compare/1.1.0...1.0.0))
 
 ### feat
 
@@ -19,4 +41,4 @@
 
 - refactor setp1.
 
-## 1.0.0 ([2023-06-15](https://github.com/kuyoru-kamikisho/crommitor/-/compare/1.0.0...1.1.0))
+## 1.0.0 ([2023-06-15](https://github.com/kuyoru-kamikisho/crommitor/-/compare/1.0.0...1.1.21))
