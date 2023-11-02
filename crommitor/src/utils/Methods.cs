@@ -264,6 +264,10 @@ namespace comi.utils
                         }
                     }
                 }
+                else
+                {
+                    continue;
+                }
 
                 // 匹配作者
                 if (!ignoreuser)
